@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+	#temp {
+		font-size: 150%;
+		color: #FFFFFF;
+		display: block;
+		width: 128px;
+		height: 48px;
+		background-image: url("temp-bg.png");
+		position: relative;
+	}
+	#temp p{
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		top: 11px;
+		left: 0;
+		width: 100%;
+		text-align: center;
+	}
+	#light {
+		font-size: 135%;
+		color: #FFFFFF;
+		display: block;
+		width: 128px;
+		height: 48px;
+		background-image: url("light-bg.png");
+		position: relative;
+	}
+	#light p{
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		top: 12px;
+		left: -4px;
+		width: 100%;
+		text-align: center;
+	}
+	</style>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	var socket = io.connect();
+	window.widget_templates = {};
+	socket.on('widget_config', function (data) {
+		for(var widget_name in data){
+			$('#main_container').append('<div id="'+widget_name+'">'+data[widget_name]+'</div>'+"\n");
+			window.widget_templates[widget_name] = data[widget_name];
+		}
+	});
+	socket.on('widget_update', function(data){
+		var widget_name = data.widget_name;
+		var template_content = window.widget_templates[widget_name];
+		var final_widget_content = template_content.replace(/\$([a-z]+)/g, function(found_item, sub1){
+			return data.widget_data[sub1];
+		});
+		$('#'+widget_name).html(final_widget_content);
+	});
+	</script>
+</head>
+<body>
+	<div id="main_container">
+		
+	</div>
+</body>
+</html>
